@@ -1,4 +1,4 @@
-import React, {useMemo, useState, useTransition} from 'react';
+import React, { useDeferredValue, useMemo, useState, useTransition } from 'react';
 import InfoBlock from "./homePagaUtils/InfoBlock";
 import { searchLists } from "../InfoStore";
 
@@ -6,19 +6,14 @@ const HomePage = () => {
 
     const [fioLists, setFioList] = useState(searchLists);
     const [value, setValue] = useState('');
-    const [filteredValue, setFilteredValue] = useState('');
-    const [isLoading, startTransition] = useTransition();
-
+    const deferredValue = useDeferredValue(value);
     const onChangeValue = (event) => {
-        setValue(event.target.value)
-        startTransition(() => {
-            setFilteredValue(event.target.value)
-        })
+        setValue(event.target.value);
     }
 
     const filteredItem =  useMemo(() => {
-        return fioLists.filter(item => item.fio.toLowerCase().includes(filteredValue.toLowerCase()));
-    }, [filteredValue])
+        return fioLists.filter(item => item.fio.toLowerCase().includes(deferredValue.toLowerCase()));
+    }, [deferredValue])
 
     return (
         <div className='container'>
@@ -35,7 +30,6 @@ const HomePage = () => {
                         name="search"
                         className='mx-4'
                     />
-                    {isLoading && <h1>Загрузка</h1>}
                     <ul className='list-unstyled mt-2'>
                         {filteredItem.map((data) =>
                                 <li key={data.id} style={data.style} className='mb-2'>
